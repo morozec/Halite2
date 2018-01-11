@@ -67,7 +67,7 @@ namespace Halite2
                     var shipsIds = myShips.Keys.ToList();
                     for (var i = 0; i < shipsIds.Count; ++i)
                     {
-                        if ((i < 5) && (i > currentTurn))
+                        if (i < 5 && i > currentTurn)
                         {
                             continue;
                         }
@@ -81,37 +81,16 @@ namespace Halite2
                         var sortedEntities = new SortedDictionary<double, Entity>(entities);
 
                         Move command = null;
+
                         foreach (var dist in sortedEntities.Keys)
                         {
                             var unit = sortedEntities[dist];
-                            var planet = unit as Planet;
-                            if (planet != null && (!planet.IsOwned() || planet.GetOwner() == gameMap.GetMyPlayerId()) &&
-                                                   (planetsShips[planet.GetId()].Count < planet.GetDockingSpots() ||
-                                                    shipsPlanets.ContainsKey(id) &&
-                                                    shipsPlanets[id] == planet.GetId()))
-                            {
-                                command = GetPlanetCommand(ship, planet, gameMap);
-
-                                if (command != null)
-                                {
-                                    if (shipsPlanets.ContainsKey(id))
-                                    {
-                                        planetsShips[shipsPlanets[id]].Remove(id);
-                                    }
-                                    planetsShips[planet.GetId()].Add(id);
-                                    var str = string.Format("{0}:{1}",
-                                        planet.GetId(),
-                                        planetsShips[planet.GetId()].Count);
-                                    Log.LogMessage(str);
-
-                                    shipsPlanets[id] = planet.GetId();
-                                    break;
-                                }
-                            }
-
                             var enemyShip = unit as Ship;
                             if (enemyShip != null && enemyShip.GetOwner() != gameMap.GetMyPlayerId())
                             {
+                                //if (enemyShip.GetDockingStatus() == Ship.DockingStatus.Undocked) break;
+                                if (ship.GetDistanceTo(enemyShip) > Constants.MAX_SPEED * 3) break;
+
                                 command = GetShipCommand(ship, enemyShip, gameMap);
                                 if (command != null)
                                 {
@@ -121,6 +100,53 @@ namespace Halite2
                                         shipsPlanets.Remove(id);
                                     }
                                     break;
+                                }
+                            }
+                        }
+                        if (command == null)
+                        {
+                            foreach (var dist in sortedEntities.Keys)
+                            {
+                                var unit = sortedEntities[dist];
+                                var planet = unit as Planet;
+                                if (planet != null &&
+                                    (!planet.IsOwned() || planet.GetOwner() == gameMap.GetMyPlayerId()) &&
+                                    (planetsShips[planet.GetId()].Count < planet.GetDockingSpots() ||
+                                     shipsPlanets.ContainsKey(id) &&
+                                     shipsPlanets[id] == planet.GetId()))
+                                {
+                                    command = GetPlanetCommand(ship, planet, gameMap);
+
+                                    if (command != null)
+                                    {
+                                        if (shipsPlanets.ContainsKey(id))
+                                        {
+                                            planetsShips[shipsPlanets[id]].Remove(id);
+                                        }
+                                        planetsShips[planet.GetId()].Add(id);
+                                        //var str = string.Format("{0}:{1}",
+                                        //    planet.GetId(),
+                                        //    planetsShips[planet.GetId()].Count);
+                                        //Log.LogMessage(str);
+
+                                        shipsPlanets[id] = planet.GetId();
+                                        break;
+                                    }
+                                }
+
+                                var enemyShip = unit as Ship;
+                                if (enemyShip != null && enemyShip.GetOwner() != gameMap.GetMyPlayerId())
+                                {
+                                    command = GetShipCommand(ship, enemyShip, gameMap);
+                                    if (command != null)
+                                    {
+                                        if (shipsPlanets.ContainsKey(id))
+                                        {
+                                            planetsShips[shipsPlanets[id]].Remove(id);
+                                            shipsPlanets.Remove(id);
+                                        }
+                                        break;
+                                    }
                                 }
                             }
                         }
