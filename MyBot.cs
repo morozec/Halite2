@@ -26,8 +26,8 @@ namespace Halite2
                 destPoint,
                 Constants.MAX_SPEED,
                 true,
-                Constants.MAX_NAVIGATION_CORRECTIONS,
-                5);
+                Constants.MAX_NAVIGATION_CORRECTIONS, 
+                Math.PI / 180.0);
         }
 
         public static void Main(string[] args)
