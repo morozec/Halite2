@@ -80,7 +80,8 @@ namespace Halite2
                     foreach (var dist in sortedEntities.Keys)
                     {
                         var unit = sortedEntities[dist];
-                        if (unit is Planet planet && (!planet.IsOwned() || planet.GetOwner() == gameMap.GetMyPlayerId() &&
+                        var planet = unit as Planet;
+                        if (planet != null && (!planet.IsOwned() || planet.GetOwner() == gameMap.GetMyPlayerId() &&
                                                (planetsShips[planet.GetId()].Count < planet.GetDockingSpots() ||
                                                 shipsPlanets.ContainsKey(id) &&
                                                 shipsPlanets[id] == planet.GetId())))
@@ -99,7 +100,8 @@ namespace Halite2
                             }
                         }
 
-                        if (unit is Ship enemyShip && enemyShip.GetOwner() != gameMap.GetMyPlayerId())
+                        var enemyShip = unit as Ship;
+                        if (enemyShip != null && enemyShip.GetOwner() != gameMap.GetMyPlayerId())
                         {
                             command = GetShipCommand(ship, enemyShip, gameMap);
                             if (command != null)
