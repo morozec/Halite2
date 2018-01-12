@@ -20,7 +20,7 @@ namespace Halite2
         {
             var isWeakEnemy = enemyShip.GetHealth() <= ship.GetHealth() ||
                               enemyShip.GetDockingStatus() != Ship.DockingStatus.Undocked;
-            var destPoint = isWeakEnemy ? ship.GetClosestPoint(enemyShip) : enemyShip;
+            var destPoint = isWeakEnemy ? ship.GetClosestPoint(enemyShip, Constants.MIN_DISTANCE_FOR_CLOSEST_POINT) : enemyShip;
             return Navigation.NavigateShipTowardsTarget(gameMap,
                 ship,
                 destPoint,
