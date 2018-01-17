@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Halite2.AStar
 {
@@ -52,7 +53,24 @@ namespace Halite2.AStar
 
         public override IEnumerable<APoint> GetNeighbors(IEnumerable<APoint> points)
         {
-            return Neighbors;
+            var result = new List<APoint>();
+            foreach (var neighbour in Neighbors)
+            {
+                if (Math.Abs(GetHeuristicCost(neighbour) - Side) < Eps)
+                {
+                    result.Add(neighbour);
+                }
+                else
+                {
+                    var commonNeighbours = Neighbors.Where(n => neighbour.Neighbors.Contains(n));
+                    if (commonNeighbours.All(n => n.Weight < AStar.BigWeight))
+                    {
+                        result.Add(neighbour);
+                    }
+                }
+            }
+
+            return result;
         }
 
         public override double GetHeuristicCost(APoint goal)

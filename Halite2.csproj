@@ -47,6 +47,7 @@
     <Compile Include="AStar\AStar.cs" />
     <Compile Include="AStar\Calculator.cs" />
     <Compile Include="AStar\ExpansionMatrixConteiner.cs" />
+    <Compile Include="AStar\IntersectCalculator.cs" />
     <Compile Include="hlt\Collision.cs" />
     <Compile Include="hlt\Constants.cs" />
     <Compile Include="hlt\DockMove.cs" />

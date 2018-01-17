@@ -75,6 +75,11 @@ namespace Halite2
             return result;
         }
 
+        private static Move GetNavigateCommand()
+        {
+            
+        }
+
         private static Move GetPlanetCommand(Ship ship, Planet planet, IDictionary<int, Ship> myShips)
         {
             var squareI = _aStar.GetSquareI(ship.GetXPos());
@@ -87,7 +92,7 @@ namespace Halite2
                 //    s.Key != ship.GetId() && _aStar.GetSquareI(s.Value.GetXPos()) == squareI &&
                 //    _aStar.GetSquareJ(s.Value.GetYPos()) == squareJ))
                 //{
-                _aStar.AddBigWeight(startPoint);
+                _aStar.AddBigWeight(ship.GetXPos(), ship.GetYPos(), Constants.SHIP_RADIUS);
                 //}
 
                 return new DockMove(ship, planet);
@@ -110,50 +115,95 @@ namespace Halite2
             {
 
                 Log.LogMessage("No planet " + ship.GetId());
-                _aStar.AddBigWeight(startPoint);
+                _aStar.AddBigWeight(ship.GetXPos(), ship.GetYPos(), Constants.SHIP_RADIUS);
                 return new ThrustMove(ship, 0, 0);
             }
-            var path = Calculator.GetPath(startPoint, endPoint, _aStar.Squares);
-            if (ship.GetId() == 2)
+
+            var resPos = new Position(endPoint.CenterX, endPoint.CenterY);
+            var resAngle = ship.OrientTowardsInRad(resPos);
+            var resDist = ship.GetDistanceTo(resPos);
+            var endStepPos = new Position(ship.GetXPos() + Constants.MAX_SPEED * Math.Cos(resAngle),
+                ship.GetYPos() + Constants.MAX_SPEED * Math.Sin(resAngle));
+
+            var intersects = IntersectCalculator.GetLineSquares(ship, endStepPos, AStar.AStar.SquareSize);
+
+            
+
+            if (ship.GetId() == 11)
             {
-                Log.LogMessage("2:");
-                foreach (ASquare step in path)
+                Log.LogMessage("Ship pos: " + ship.GetXPos() + " " + ship.GetYPos());
+                Log.LogMessage("End pos: " + endStepPos.GetXPos() + " " + endStepPos.GetYPos());
+            }
+            if (ship.GetId() ==11)
+            {
+                foreach (var item in intersects)
                 {
-                    Log.LogMessage(step.CenterX + " " + step.CenterY);
+                    Log.LogMessage(_aStar.Table[item.Item1, item.Item2].CenterX + " " +
+                                   _aStar.Table[item.Item1, item.Item2].CenterY + " " +
+                                   _aStar.Table[item.Item1, item.Item2].Weight);
                 }
                 Log.LogMessage("");
             }
 
-            if (ship.GetId() == 0)
+            var allOk = intersects.All(item => _aStar.Table[item.Item1, item.Item2].Weight < AStar.AStar.BigWeight);
+
+
+            if (allOk)
             {
-                Log.LogMessage("0:");
-                foreach (ASquare step in path)
+                var speed = resDist > Constants.MAX_SPEED ? Constants.MAX_SPEED : (int) resDist + 1;
+                var angle = ship.OrientTowardsInDeg(resPos);
+                foreach (var item in intersects)
                 {
-                    Log.LogMessage(step.CenterX + " " + step.CenterY);
+                    _aStar.AddBigWeight(_aStar.Table[item.Item1, item.Item2]);
                 }
-                Log.LogMessage("");
+                return new ThrustMove(ship, angle, speed);
             }
+
+            var path = Calculator.GetPath(startPoint, endPoint, _aStar.Squares);
+
+            //if (ship.GetId() == 0) throw new Exception();
 
             if (path.Count >= 2)
             {
                 int counter = 1;
                 var targetPoint = path[counter] as ASquare;
                 var direction = GetDirection(startPoint, targetPoint);
-                while (counter < path.Count - 1)
+                var targetPosition = new Position(targetPoint.CenterX, targetPoint.CenterY);
+                var dist = ship.GetDistanceTo(targetPosition);
+
+                while (counter < path.Count - 1 && dist < Constants.MAX_SPEED)
                 {
                     counter++;
                     if (GetDirection(targetPoint, path[counter] as ASquare) != direction) break;
                     targetPoint = path[counter] as ASquare;
+                    targetPosition = new Position(targetPoint.CenterX, targetPoint.CenterY);
+                    dist = ship.GetDistanceTo(targetPosition);
                 }
 
-                var targetPosition = new Position(targetPoint.CenterX, targetPoint.CenterY);
-                var angle = ship.OrientTowardsInDeg(targetPosition);
-                var dist = ship.GetDistanceTo(targetPosition);
-                var speed = dist > Constants.MAX_SPEED ? Constants.MAX_SPEED : (int) dist;
 
-                for (var i = 0; i < counter; ++i)
+                var angle = ship.OrientTowardsInDeg(targetPosition);
+                var speed = dist > Constants.MAX_SPEED ? Constants.MAX_SPEED : (int) dist + 1;
+
+                if (ship.GetId() == 11)
                 {
-                    _aStar.AddBigWeight(path[i] as ASquare);
+                    Log.LogMessage("Path:");
+                }
+                for (var i = 0; i < path.Count; ++i)
+                {
+                    if (ship.GetId() == 11)
+                    {
+                        Log.LogMessage((path[i] as ASquare).CenterX + " " +
+                                       (path[i] as ASquare).CenterY + " " +
+                                       (path[i] as ASquare).Weight);
+                    }
+
+                    if (i < counter)
+                        _aStar.AddBigWeight(path[i] as ASquare);
+                    
+                }
+                if (ship.GetId() == 11)
+                {
+                    Log.LogMessage("");
                 }
 
                 //if (!myShips.Any(s =>
@@ -174,7 +224,8 @@ namespace Halite2
                 var angle = ship.OrientTowardsInDeg(targetPosition);
                 var dist = ship.GetDistanceTo(targetPosition);
                 var speed = dist > Constants.MAX_SPEED ? Constants.MAX_SPEED : (int) dist + 1;
-                _aStar.AddBigWeight(targetPoint);
+
+                _aStar.AddBigWeight(ship.GetXPos(), ship.GetYPos(), Constants.SHIP_RADIUS);
                 return new ThrustMove(ship, angle, speed);
 
             }
@@ -205,8 +256,8 @@ namespace Halite2
 
         public static void Main(string[] args)
         {
-            try
-            {
+            //try
+            //{
 
                 IDictionary<int, IList<int>> planetsShips = new Dictionary<int, IList<int>>();
                 IDictionary<int, int> shipsPlanets = new Dictionary<int, int>();
@@ -232,7 +283,14 @@ namespace Halite2
                 {
                     _gotShipIds.Clear();
                     moveList.Clear();
-                    gameMap.UpdateMap(Networking.ReadLineIntoMetadata());
+                    try
+                    {
+                        gameMap.UpdateMap(Networking.ReadLineIntoMetadata());
+                    }
+                    catch (Exception)
+                    {
+                        return;
+                    }
                     _aStar.UpdateAStar();
 
                     var ships = gameMap.GetAllShips();
@@ -274,16 +332,14 @@ namespace Halite2
                     {
                         if (ship.Value.GetDockingStatus() != Ship.DockingStatus.Undocked)
                         {
-                            var square = _aStar.Table[_aStar.GetSquareI(ship.Value.GetXPos()),
-                                _aStar.GetSquareJ(ship.Value.GetYPos())];
-                            _aStar.AddBigWeight(square);
+                            _aStar.AddBigWeight(ship.Value.GetXPos(), ship.Value.GetYPos(), Constants.SHIP_RADIUS);
                         }
                     }
 
                     var myShips = gameMap.GetMyPlayer().GetShips();
                     foreach (var shipId in shipsPlanets.Keys.ToList())
                     {
-                        if (myShips.All(s => s.Key != shipId))
+                        if (myShips.All(s => s.Key != shipId) && planetsShips.ContainsKey(shipsPlanets[shipId]))
                         {
                             planetsShips[shipsPlanets[shipId]].Remove(shipId);
                             shipsPlanets.Remove(shipId);
@@ -423,11 +479,11 @@ namespace Halite2
                     _currentTurn++;
                     Networking.SendMoves(moveList);
                 }
-            }
-            catch (Exception e)
-            {
-                Log.LogMessage("Exception: " + e.Message + " " + e.InnerException);
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    Log.LogMessage("Exception: " + e.Message + " " + e.InnerException);
+            //}
         }
     }
 }

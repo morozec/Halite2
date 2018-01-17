@@ -6,7 +6,7 @@ namespace Halite2.AStar
 {
     public class AStar
     {
-        public static double SquareSize = Constants.MAX_SPEED/2d;
+        public static double SquareSize = Constants.MAX_SPEED/3d;
         public static double BigWeight = 999999;
 
         private const double StartX = 0;
@@ -131,6 +131,30 @@ namespace Halite2.AStar
             }
         }
 
+        public void AddBigWeight(double x, double y, double radius)
+        {
+            var startSquareI = GetSquareI(x - radius);
+            var endSquareI = GetSquareI(x + radius);
+            var startSquareJ = GetSquareJ(y - radius);
+            var endSquareJ = GetSquareJ(y + radius);
+
+            for (var i = startSquareI; i <= endSquareI; ++i)
+            {
+                for (var j = startSquareJ; j <= endSquareJ; ++j)
+                {
+                    var aSquare = Table[i, j];
+                    if (aSquare.Weight < BigWeight)
+                    {
+                        _currentStrepBigWeights.Add(aSquare);
+                    }
+
+                    aSquare.Weight = BigWeight;
+                }
+            }
+           
+
+        }
+
         public void AddBigWeight(ASquare aSquare)
         {
             if (aSquare.Weight < BigWeight)
@@ -147,7 +171,7 @@ namespace Halite2.AStar
             {
                 square.Weight = 1d;
             }
-            _currentStrepBigWeights.Clear();
+            _currentStrepBigWeights = new List<ASquare>();
         }
 
         //public void UpdateDynamicAStar(
