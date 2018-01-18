@@ -42,7 +42,7 @@ namespace Halite2.hlt {
         }
 
         public Position GetClosestPoint(Position target, double dist) {
-            double radius = target.GetRadius();
+            double radius = target.GetRadius() + dist;
             double angleRad = target.OrientTowardsInRad(this);
 
             double x = target.GetXPos() + radius * Math.Cos(angleRad);
