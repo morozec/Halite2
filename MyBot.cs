@@ -75,12 +75,8 @@ namespace Halite2
             return result;
         }
 
-        private static Move GetNavigateCommand(Ship ship, ASquare endPoint, bool addOne)
+        private static Move GetNavigateCommand(Ship ship, ASquare startPoint, ASquare endPoint, bool addOne)
         {
-            var squareI = _aStar.GetSquareI(ship.GetXPos());
-            var squareJ = _aStar.GetSquareJ(ship.GetYPos());
-            var startPoint = _aStar.Table[squareI, squareJ];
-
             var resPos = new Position(endPoint.CenterX, endPoint.CenterY);
             var resAngle = ship.OrientTowardsInRad(resPos);
             var resDist = ship.GetDistanceTo(resPos);
@@ -252,7 +248,11 @@ namespace Halite2
                 return new ThrustMove(ship, 0, 0);
             }
 
-            return GetNavigateCommand(ship, endPoint, true);
+            var squareI = _aStar.GetSquareI(ship.GetXPos());
+            var squareJ = _aStar.GetSquareJ(ship.GetYPos());
+            var startPoint = _aStar.Table[squareI, squareJ];
+
+            return GetNavigateCommand(ship, startPoint, endPoint, true);
 
 
 
@@ -292,7 +292,23 @@ namespace Halite2
             var j = _aStar.GetSquareJ(destPoint.GetYPos());
             var endPoint = _aStar.Table[i, j];
 
-            return GetNavigateCommand(ship, endPoint, !isWeakEnemy);
+            var squareI = _aStar.GetSquareI(ship.GetXPos());
+            var squareJ = _aStar.GetSquareJ(ship.GetYPos());
+            var startPoint = _aStar.Table[squareI, squareJ];
+
+            if (startPoint.Weight >= AStar.AStar.BigWeight || endPoint.Weight >= AStar.AStar.BigWeight) //для сокращения времени
+            {
+                var command = Navigation.NavigateShipTowardsTarget(gameMap,
+                    ship,
+                    destPoint,
+                    Constants.MAX_SPEED,
+                    true,
+                    Constants.MAX_NAVIGATION_CORRECTIONS,
+                    Math.PI / 180.0);
+                if (command != null) return command;
+            }
+
+            return GetNavigateCommand(ship, startPoint, endPoint, !isWeakEnemy);
         }
 
         public static void Main(string[] args)
