@@ -75,8 +75,9 @@ namespace Halite2.AStar
 
         public override double GetHeuristicCost(APoint goal)
         {
-            //return GetManhattanDistance(this, (ASquare)goal);
-            return GetEuclidDistance(this, (ASquare)goal);
+            var dist = GetEuclidDistance(this, (ASquare)goal);
+            //if (dist > Side) dist += 0.01;
+            return dist;
             //if (AdditionalAngleCoeffs.ContainsKey(goal as ASquare))
             //{
             //    res += AdditionalAngleCoeffs[goal as ASquare];

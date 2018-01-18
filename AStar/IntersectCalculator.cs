@@ -10,7 +10,7 @@ namespace Halite2.AStar
     public static class IntersectCalculator
     {
         private const double Tolerance = 1E-3;
-
+        
         /// <summary>
         /// Main method to get all anchor crossing squares
         /// </summary>
@@ -18,7 +18,7 @@ namespace Halite2.AStar
         /// <param name="end">End anchor point</param>
         /// <param name="squareSide">square side</param>
         /// <returns></returns>
-        public static IList<Tuple<int, int>> GetLineSquares(Position start, Position end, double squareSide)
+        public static List<Tuple<int, int>> GetLineSquares(Position start, Position end, double squareSide)
         {
             //invert anchor if start.X > end.X 
             var realStart = start.GetXPos() <= end.GetXPos() ? start : end;
