@@ -270,11 +270,11 @@ namespace Halite2
                               enemyShip.GetDockingStatus() != Ship.DockingStatus.Undocked;
             var destPoint = isWeakEnemy ? ship.GetClosestPoint(enemyShip, Constants.MIN_DISTANCE_FOR_CLOSEST_POINT) : enemyShip;
 
-            if (isWeakEnemy && ship.GetDistanceTo(enemyShip) <= Constants.WEAPON_RADIUS)
-            {
-                _aStar.AddBigWeight(ship.GetXPos(), ship.GetYPos(), Constants.SHIP_RADIUS);
-                return new ThrustMove(ship, 0, 0);
-            }
+            //if (isWeakEnemy && ship.GetDistanceTo(enemyShip) <= Constants.WEAPON_RADIUS)
+            //{
+            //    _aStar.AddBigWeight(ship.GetXPos(), ship.GetYPos(), Constants.SHIP_RADIUS);
+            //    return new ThrustMove(ship, 0, 0);
+            //}
 
             //if (!isWeakEnemy)
             //{
@@ -288,13 +288,13 @@ namespace Halite2
             //    if (command != null) return command;
             //}
 
-            var i = _aStar.GetSquareI(destPoint.GetXPos());
-            var j = _aStar.GetSquareJ(destPoint.GetYPos());
-            var endPoint = _aStar.Table[i, j];
+            //var i = _aStar.GetSquareI(destPoint.GetXPos());
+            //var j = _aStar.GetSquareJ(destPoint.GetYPos());
+            //var endPoint = _aStar.Table[i, j];
 
-            var squareI = _aStar.GetSquareI(ship.GetXPos());
-            var squareJ = _aStar.GetSquareJ(ship.GetYPos());
-            var startPoint = _aStar.Table[squareI, squareJ];
+            //var squareI = _aStar.GetSquareI(ship.GetXPos());
+            //var squareJ = _aStar.GetSquareJ(ship.GetYPos());
+            //var startPoint = _aStar.Table[squareI, squareJ];
 
             //if (startPoint.Weight >= AStar.AStar.BigWeight || endPoint.Weight >= AStar.AStar.BigWeight) //для сокращения времени
             //{
