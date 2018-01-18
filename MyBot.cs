@@ -296,19 +296,29 @@ namespace Halite2
             var squareJ = _aStar.GetSquareJ(ship.GetYPos());
             var startPoint = _aStar.Table[squareI, squareJ];
 
-            if (startPoint.Weight >= AStar.AStar.BigWeight || endPoint.Weight >= AStar.AStar.BigWeight) //для сокращения времени
-            {
-                var command = Navigation.NavigateShipTowardsTarget(gameMap,
-                    ship,
-                    destPoint,
-                    Constants.MAX_SPEED,
-                    true,
-                    Constants.MAX_NAVIGATION_CORRECTIONS,
-                    Math.PI / 180.0);
-                if (command != null) return command;
-            }
+            //if (startPoint.Weight >= AStar.AStar.BigWeight || endPoint.Weight >= AStar.AStar.BigWeight) //для сокращения времени
+            //{
+            //    var command = Navigation.NavigateShipTowardsTarget(gameMap,
+            //        ship,
+            //        destPoint,
+            //        Constants.MAX_SPEED,
+            //        true,
+            //        Constants.MAX_NAVIGATION_CORRECTIONS,
+            //        Math.PI / 180.0);
+            //    if (command != null) return command;
+            //}
 
-            return GetNavigateCommand(ship, startPoint, endPoint, !isWeakEnemy);
+            //return GetNavigateCommand(ship, startPoint, endPoint, !isWeakEnemy);
+
+            return Navigation.NavigateShipTowardsTarget(gameMap,
+                       ship,
+                       destPoint,
+                       Constants.MAX_SPEED,
+                       true,
+                       Constants.MAX_NAVIGATION_CORRECTIONS,
+                       Math.PI / 180.0) ?? new ThrustMove(ship, 0, 0);
+
+
         }
 
         public static void Main(string[] args)
