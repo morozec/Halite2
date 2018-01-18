@@ -83,25 +83,32 @@ namespace Halite2
             var endStepPos = new Position(ship.GetXPos() + Constants.MAX_SPEED * Math.Cos(resAngle),
                 ship.GetYPos() + Constants.MAX_SPEED * Math.Sin(resAngle));
 
-            var intersects =
-                IntersectCalculator.GetLineSquares(new Position(ship.GetXPos() - Constants.SHIP_RADIUS, ship.GetYPos()),
-                    new Position(endStepPos.GetXPos() - Constants.SHIP_RADIUS, endStepPos.GetYPos()),
-                    AStar.AStar.SquareSize);
+            var intersects = new List<Tuple<int, int>>();
+
+            var intersects1 = IntersectCalculator.GetLineSquares(
+                new Position(ship.GetXPos() - Constants.SHIP_RADIUS, ship.GetYPos()),
+                new Position(endStepPos.GetXPos() - Constants.SHIP_RADIUS, endStepPos.GetYPos()),
+                AStar.AStar.SquareSize);
+            intersects.AddRange(intersects1.Where(x =>
+                x.Item1 > 0 && x.Item2 > 0 && x.Item1 < _aStar.N && x.Item2 < _aStar.M));
 
             var intersects2 = IntersectCalculator.GetLineSquares(new Position(ship.GetXPos() + Constants.SHIP_RADIUS, ship.GetYPos()),
                 new Position(endStepPos.GetXPos() + Constants.SHIP_RADIUS, endStepPos.GetYPos()),
                 AStar.AStar.SquareSize);
-            intersects.AddRange(intersects2.Where(x => !intersects.Contains(x)));
+            intersects.AddRange(intersects2.Where(x =>
+                !intersects.Contains(x) && x.Item1 > 0 && x.Item2 > 0 && x.Item1 < _aStar.N && x.Item2 < _aStar.M));
 
             var intersects3 = IntersectCalculator.GetLineSquares(new Position(ship.GetXPos(), ship.GetYPos() - Constants.SHIP_RADIUS),
                 new Position(endStepPos.GetXPos(), endStepPos.GetYPos() - Constants.SHIP_RADIUS),
                 AStar.AStar.SquareSize);
-            intersects.AddRange(intersects3.Where(x => !intersects.Contains(x)));
+            intersects.AddRange(intersects3.Where(x =>
+                !intersects.Contains(x) && x.Item1 > 0 && x.Item2 > 0 && x.Item1 < _aStar.N && x.Item2 < _aStar.M));
 
             var intersects4 = IntersectCalculator.GetLineSquares(new Position(ship.GetXPos(), ship.GetYPos() + Constants.SHIP_RADIUS),
                 new Position(endStepPos.GetXPos(), endStepPos.GetYPos() + Constants.SHIP_RADIUS),
                 AStar.AStar.SquareSize);
-            intersects.AddRange(intersects4.Where(x => !intersects.Contains(x)));
+            intersects.AddRange(intersects4.Where(x =>
+                !intersects.Contains(x) && x.Item1 > 0 && x.Item2 > 0 && x.Item1 < _aStar.N && x.Item2 < _aStar.M));
 
             if (ship.GetId() == 25)
             {
