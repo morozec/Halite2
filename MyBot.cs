@@ -532,6 +532,25 @@ namespace Halite2
                         }
                     }
 
+                    if (_currentTurn < 5)
+                    {
+                        var hasTargetPlanet = planetsShips.Any(ps => planetsShips[ps.Key].Any() && planets[ps.Key].GetDockingSpots() >= 3);
+                        if (hasTargetPlanet)
+                        {
+                            var targetPlanet = planetsShips.FirstOrDefault(ps => planetsShips[ps.Key].Any() && planets[ps.Key].GetDockingSpots() >= 3);
+                            var changingShipIds =
+                                shipsPlanets.Keys.Where(shipId => shipsPlanets[shipId] != targetPlanet.Key).ToList();
+                            foreach (var id in changingShipIds)
+                            {
+                                planetsShips[shipsPlanets[id]].Remove(id);
+                                planetsShips[targetPlanet.Key].Add(id);
+                                shipsPlanets[id] = targetPlanet.Key;
+                            }
+
+                        }
+                        
+                    }
+
                     
                     foreach (var planetId in planetsShips.Keys)
                     {
