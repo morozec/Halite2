@@ -507,9 +507,9 @@ namespace Halite2
                             var enemyShip = unit as Ship;
                             if (enemyShip != null && enemyShip.GetOwner() != gameMap.GetMyPlayerId())
                             {
-                                var enemyI = _aStar.GetSquareI(enemyShip.GetXPos());
-                                var enemyJ = _aStar.GetSquareJ(enemyShip.GetYPos());
-                                if (_aStar.Table[enemyI, enemyJ].Weight >= AStar.AStar.BigWeight) continue;
+                                //var enemyI = _aStar.GetSquareI(enemyShip.GetXPos());
+                                //var enemyJ = _aStar.GetSquareJ(enemyShip.GetYPos());
+                                //if (_aStar.Table[enemyI, enemyJ].Weight >= AStar.AStar.BigWeight) continue;
 
                                 if (shipsPlanets.ContainsKey(id))
                                 {
