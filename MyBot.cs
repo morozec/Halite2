@@ -110,12 +110,12 @@ namespace Halite2
             intersects.AddRange(intersects4.Where(x =>
                 !intersects.Contains(x) && x.Item1 > 0 && x.Item2 > 0 && x.Item1 < _aStar.N && x.Item2 < _aStar.M));
 
-            if (ship.GetId() == 25)
+            if (ship.GetId() == 7)
             {
                 Log.LogMessage("Ship pos: " + ship.GetXPos() + " " + ship.GetYPos());
                 Log.LogMessage("End pos: " + endStepPos.GetXPos() + " " + endStepPos.GetYPos());
             }
-            if (ship.GetId() == 25)
+            if (ship.GetId() == 7)
             {
                 foreach (var item in intersects)
                 {
@@ -178,14 +178,14 @@ namespace Halite2
                     if (addOne) speed += 1;
                 }
 
-                if (ship.GetId() == 25)
+                if (ship.GetId() == 7)
                 {
                     Log.LogMessage("Path:");
                 }
 
                 for (var i = 0; i < path.Count; ++i)
                 {
-                    if (ship.GetId() == 25)
+                    if (ship.GetId() == 7)
                     {
                         Log.LogMessage((path[i] as ASquare).CenterX + " " +
                                        (path[i] as ASquare).CenterY + " " +
@@ -197,7 +197,7 @@ namespace Halite2
 
                 }
 
-                if (ship.GetId() == 25)
+                if (ship.GetId() == 7)
                 {
                     Log.LogMessage("");
                 }
@@ -212,7 +212,7 @@ namespace Halite2
             }
             else
             {
-                if (ship.GetId() == 25)
+                if (ship.GetId() == 7)
                 {
                     Log.LogMessage("Short path");
                 }

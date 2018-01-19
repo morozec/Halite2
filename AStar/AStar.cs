@@ -111,7 +111,7 @@ namespace Halite2.AStar
                     square.Neighbors = neighbors;
                 }
             }
-
+            Log.LogMessage("Planet bw:");
             foreach (var p in gameMap.GetAllPlanets())
             {
                 var planet = p.Value;
@@ -121,8 +121,9 @@ namespace Halite2.AStar
                     {
                         var square = Table[i, j];
                         var dist = planet.GetDistanceTo(new Position(square.CenterX, square.CenterY));
-                        if (dist < planet.GetRadius() + Constants.SHIP_RADIUS)
+                        if (dist < planet.GetRadius() + Constants.SHIP_RADIUS * 2)
                         {
+                            Log.LogMessage(square.CenterX + " " + square.CenterY);
                             square.Weight = BigWeight;
                         }
 
