@@ -46,6 +46,42 @@ namespace Halite2
             throw new Exception("Unknown direction");
         }
 
+        private static bool IsWinBattle(Ship myShip, Ship enemyShip, GameMap gameMap)
+        {
+            var allShips = gameMap.GetAllShips();
+            var attackPoint = myShip.GetClosestPoint(enemyShip, Constants.MIN_DISTANCE_FOR_CLOSEST_POINT);
+
+            var attackPointDist = myShip.GetDistanceTo(attackPoint);
+            if (attackPointDist > Constants.MAX_SPEED) return true;
+
+            var enemyCount = 0;
+            var myCount = 0;
+            foreach (var ship in allShips)
+            {
+                if (ship.GetDockingStatus() != Ship.DockingStatus.Undocked) continue;
+                if (ship.GetOwner() != myShip.GetOwner())
+                {
+                    var dist = ship.GetDistanceTo(attackPoint);
+                    if (dist < Constants.MAX_SPEED + Constants.WEAPON_RADIUS)
+                    {
+                        enemyCount++;
+                    }
+                }
+                else
+                {
+                    var dist = ship.GetDistanceTo(enemyShip);
+                    if (dist < Constants.MAX_SPEED + Constants.WEAPON_RADIUS)
+                    {
+                        myCount++;
+                    }
+                }
+            }
+
+            if (myCount > enemyCount) return true;
+            if (myCount < enemyCount) return false;
+            return myShip.GetHealth() >= enemyShip.GetHealth();
+        }
+
         private static IList<ASquare> GetPlanetDockingSquares(Planet planet)
         {
             var result = new List<ASquare>();
@@ -273,9 +309,18 @@ namespace Halite2
 
         private static Move GetShipCommand(Ship ship, Ship enemyShip, GameMap gameMap)
         {
-            var isWeakEnemy = enemyShip.GetHealth() <= ship.GetHealth() ||
-                              enemyShip.GetDockingStatus() != Ship.DockingStatus.Undocked;
-            var destPoint = isWeakEnemy ? ship.GetClosestPoint(enemyShip, Constants.MIN_DISTANCE_FOR_CLOSEST_POINT) : enemyShip;
+            var isWinBattle = IsWinBattle(ship, enemyShip, gameMap);
+            var destPoint =
+                ship.GetClosestPoint(enemyShip,
+                    isWinBattle
+                        ? Constants.MIN_DISTANCE_FOR_CLOSEST_POINT
+                        : Constants.MIN_DISTANCE_FOR_CLOSEST_POINT + Constants.MAX_SPEED);
+
+            //var isWeakEnemy = enemyShip.GetHealth() <= ship.GetHealth() ||
+            //                  enemyShip.GetDockingStatus() != Ship.DockingStatus.Undocked;
+            //var destPoint = isWeakEnemy ? ship.GetClosestPoint(enemyShip, Constants.MIN_DISTANCE_FOR_CLOSEST_POINT) : enemyShip;
+
+
 
             //if (isWeakEnemy && ship.GetDistanceTo(enemyShip) <= Constants.WEAPON_RADIUS)
             //{
